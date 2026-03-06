@@ -1,0 +1,72 @@
+#+title: claude-code-ide-extras.el
+#+author: Piotr Kwiecinski
+
+Extra features for [[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide.el]].
+
+** Features
+
+- *Project switch follow* — automatically shows the Claude Code session for the current project when switching projects via =project-switch-project=. If no session exists for the target project, any visible Claude Code windows are closed.
+
+** Installation
+
+This package is not yet available on MELPA. You can install it using one of the methods below.
+
+*** Doom Emacs
+
+Add to =packages.el=:
+
+#+begin_src emacs-lisp
+(package! claude-code-ide-extras
+  :recipe (:host github :repo "piotrkwiecinski/claude-code-ide-extras.el"))
+#+end_src
+
+Add to =config.el=:
+
+#+begin_src emacs-lisp
+(use-package! claude-code-ide-extras
+  :after claude-code-ide
+  :config
+  (claude-code-ide-extras-project-switch-mode 1))
+#+end_src
+
+*** use-package (with vc)
+
+Emacs 29+ has built-in support for installing packages from VCS:
+
+#+begin_src emacs-lisp
+(use-package claude-code-ide-extras
+  :vc (:url "https://github.com/piotrkwiecinski/claude-code-ide-extras.el"
+        :rev :newest)
+  :after claude-code-ide
+  :config
+  (claude-code-ide-extras-project-switch-mode 1))
+#+end_src
+
+*** use-package (with straight.el)
+
+#+begin_src emacs-lisp
+(use-package claude-code-ide-extras
+  :straight (:host github :repo "piotrkwiecinski/claude-code-ide-extras.el")
+  :after claude-code-ide
+  :config
+  (claude-code-ide-extras-project-switch-mode 1))
+#+end_src
+
+*** Manual
+
+Clone the repository and add it to your =load-path=:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/path/to/claude-code-ide-extras.el")
+(require 'claude-code-ide-extras)
+(claude-code-ide-extras-project-switch-mode 1)
+#+end_src
+
+** Requirements
+
+- Emacs 28.1+
+- [[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide]] 0.2.6+
+
+** License
+
+GPL-3.0-or-later. See [[file:LICENSE][LICENSE]].
