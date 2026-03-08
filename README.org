@@ -1,4 +1,4 @@
-#+title: claude-code-ide-extras.el
+#+title: claude-code-ide-companion.el
 #+author: Piotr Kwiecinski
 
 Extra features for [[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide.el]].
@@ -16,17 +16,17 @@ This package is not yet available on MELPA. You can install it using one of the 
 Add to =packages.el=:
 
 #+begin_src emacs-lisp
-(package! claude-code-ide-extras
-  :recipe (:host github :repo "piotrkwiecinski/claude-code-ide-extras.el"))
+(package! claude-code-ide-companion
+  :recipe (:host github :repo "piotrkwiecinski/claude-code-ide-companion.el"))
 #+end_src
 
 Add to =config.el=:
 
 #+begin_src emacs-lisp
-(use-package! claude-code-ide-extras
+(use-package! claude-code-ide-companion
   :after claude-code-ide
   :config
-  (claude-code-ide-extras-project-switch-mode 1))
+  (claude-code-ide-companion-project-switch-mode 1))
 #+end_src
 
 *** use-package (with vc)
@@ -34,22 +34,22 @@ Add to =config.el=:
 Emacs 29+ has built-in support for installing packages from VCS:
 
 #+begin_src emacs-lisp
-(use-package claude-code-ide-extras
-  :vc (:url "https://github.com/piotrkwiecinski/claude-code-ide-extras.el"
+(use-package claude-code-ide-companion
+  :vc (:url "https://github.com/piotrkwiecinski/claude-code-ide-companion.el"
         :rev :newest)
   :after claude-code-ide
   :config
-  (claude-code-ide-extras-project-switch-mode 1))
+  (claude-code-ide-companion-project-switch-mode 1))
 #+end_src
 
 *** use-package (with straight.el)
 
 #+begin_src emacs-lisp
-(use-package claude-code-ide-extras
-  :straight (:host github :repo "piotrkwiecinski/claude-code-ide-extras.el")
+(use-package claude-code-ide-companion
+  :straight (:host github :repo "piotrkwiecinski/claude-code-ide-companion.el")
   :after claude-code-ide
   :config
-  (claude-code-ide-extras-project-switch-mode 1))
+  (claude-code-ide-companion-project-switch-mode 1))
 #+end_src
 
 *** Manual
@@ -57,9 +57,9 @@ Emacs 29+ has built-in support for installing packages from VCS:
 Clone the repository and add it to your =load-path=:
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path "/path/to/claude-code-ide-extras.el")
-(require 'claude-code-ide-extras)
-(claude-code-ide-extras-project-switch-mode 1)
+(add-to-list 'load-path "/path/to/claude-code-ide-companion.el")
+(require 'claude-code-ide-companion)
+(claude-code-ide-companion-project-switch-mode 1)
 #+end_src
 
 ** Requirements

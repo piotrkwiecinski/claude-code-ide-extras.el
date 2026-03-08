@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Compile and test check for claude-code-ide-extras
+# Compile and test check for claude-code-ide-companion
 
 set -euo pipefail
 
@@ -40,7 +40,7 @@ LOAD_PATH="-L . -L $DEPS_DIR/claude-code-ide.el"
 echo "=== Running byte-compilation check ===" >&2
 emacs -batch $LOAD_PATH \
     --eval "(setq byte-compile-warnings '(not free-vars unresolved))" \
-    -f batch-byte-compile claude-code-ide-extras.el
+    -f batch-byte-compile claude-code-ide-companion.el
 COMPILE_EXIT_CODE=$?
 
 if [ $COMPILE_EXIT_CODE -eq 0 ]; then
@@ -56,7 +56,7 @@ if [ $COMPILE_EXIT_CODE -eq 0 ] && [ "$WITH_NATIVE_COMPILE" = true ]; then
     if emacs -batch --eval "(if (featurep 'native-compile) (message \"yes\") (message \"no\"))" 2>&1 | grep -q "yes"; then
         echo "" >&2
         echo "=== Running native-compilation check ===" >&2
-        emacs -batch $LOAD_PATH -f batch-native-compile claude-code-ide-extras.el
+        emacs -batch $LOAD_PATH -f batch-native-compile claude-code-ide-companion.el
         NATIVE_COMPILE_EXIT_CODE=$?
 
         if [ $NATIVE_COMPILE_EXIT_CODE -eq 0 ]; then
@@ -75,7 +75,7 @@ TEST_FAILED=0
 if [ $COMPILE_EXIT_CODE -eq 0 ] && [ $NATIVE_COMPILE_EXIT_CODE -eq 0 ]; then
     echo "" >&2
     echo "=== Running tests ===" >&2
-    emacs -batch -L . -l ert -l claude-code-ide-extras-tests.el -f ert-run-tests-batch-and-exit >&2
+    emacs -batch -L . -l ert -l claude-code-ide-companion-tests.el -f ert-run-tests-batch-and-exit >&2
     TEST_EXIT_CODE=$?
 
     if [ $TEST_EXIT_CODE -eq 0 ]; then

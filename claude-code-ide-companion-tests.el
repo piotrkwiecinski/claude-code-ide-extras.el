@@ -1,4 +1,4 @@
-;;; claude-code-ide-extras-tests.el --- Tests for claude-code-ide-extras  -*- lexical-binding: t; -*-
+;;; claude-code-ide-companion-tests.el --- Tests for claude-code-ide-companion  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 Piotr Kwiecinski
 
@@ -11,10 +11,10 @@
 
 ;;; Commentary:
 
-;; Test suite for claude-code-ide-extras.el using ERT.
+;; Test suite for claude-code-ide-companion.el using ERT.
 ;;
 ;; Run tests with:
-;;   emacs -batch -L . -l ert -l claude-code-ide-extras-tests.el \
+;;   emacs -batch -L . -l ert -l claude-code-ide-companion-tests.el \
 ;;     -f ert-run-tests-batch-and-exit
 
 ;;; Code:
@@ -22,7 +22,7 @@
 (require 'ert)
 (require 'cl-lib)
 
-;; Mock claude-code-ide dependencies before loading extras
+;; Mock claude-code-ide dependencies before loading companion
 (defvar claude-code-ide-buffer-name-function
   (lambda (dir)
     (format "*claude-code[%s]*" (file-name-nondirectory (directory-file-name dir)))))
@@ -43,19 +43,19 @@
 
 (provide 'claude-code-ide)
 
-(require 'claude-code-ide-extras)
+(require 'claude-code-ide-companion)
 
 ;;; Helpers
 
-(defun claude-code-ide-extras-tests--clear-processes ()
+(defun claude-code-ide-companion-tests--clear-processes ()
   "Clear all registered processes."
   (clrhash claude-code-ide--processes))
 
 ;;; Tests
 
-(ert-deftest claude-code-ide-extras-test-close-visible-sessions ()
+(ert-deftest claude-code-ide-companion-test-close-visible-sessions ()
   "Test that visible Claude windows are closed."
-  (claude-code-ide-extras-tests--clear-processes)
+  (claude-code-ide-companion-tests--clear-processes)
   (unwind-protect
       (let* ((buf1 (get-buffer-create "*claude-code[project1]*"))
              (buf2 (get-buffer-create "*claude-code[project2]*"))
@@ -71,16 +71,16 @@
                       (t nil))))
                   ((symbol-function 'delete-window)
                    (lambda (win) (push win deleted-windows))))
-          (claude-code-ide-extras--close-visible-sessions)
+          (claude-code-ide-companion--close-visible-sessions)
           (should (member 'win1 deleted-windows))
           (should (= (length deleted-windows) 1)))
         (kill-buffer buf1)
         (kill-buffer buf2))
-    (claude-code-ide-extras-tests--clear-processes)))
+    (claude-code-ide-companion-tests--clear-processes)))
 
-(ert-deftest claude-code-ide-extras-test-on-context-switch-shows-session ()
+(ert-deftest claude-code-ide-companion-test-on-context-switch-shows-session ()
   "Test that switching to a project with a session displays its buffer."
-  (claude-code-ide-extras-tests--clear-processes)
+  (claude-code-ide-companion-tests--clear-processes)
   (unwind-protect
       (let* ((project-dir "/test/project/")
              (buf (get-buffer-create "*claude-code[project]*"))
@@ -89,21 +89,21 @@
         (puthash project-dir mock-process claude-code-ide--processes)
         (cl-letf (((symbol-function 'claude-code-ide--get-working-directory)
                    (lambda () project-dir))
-                  ((symbol-function 'claude-code-ide-extras--close-visible-sessions)
+                  ((symbol-function 'claude-code-ide-companion--close-visible-sessions)
                    (lambda () nil))
                   ((symbol-function 'process-live-p)
                    (lambda (proc) (eq proc mock-process)))
                   ((symbol-function 'claude-code-ide--display-buffer-in-side-window)
                    (lambda (buf) (setq displayed-buffer buf))))
-          (claude-code-ide-extras--on-context-switch)
+          (claude-code-ide-companion--on-context-switch)
           (should (eq displayed-buffer buf)))
         (delete-process mock-process)
         (kill-buffer buf))
-    (claude-code-ide-extras-tests--clear-processes)))
+    (claude-code-ide-companion-tests--clear-processes)))
 
-(ert-deftest claude-code-ide-extras-test-on-context-switch-closes-windows-no-session ()
+(ert-deftest claude-code-ide-companion-test-on-context-switch-closes-windows-no-session ()
   "Test that switching to a project without a session closes visible Claude windows."
-  (claude-code-ide-extras-tests--clear-processes)
+  (claude-code-ide-companion-tests--clear-processes)
   (unwind-protect
       (let* ((other-dir "/test/other/")
              (other-buf (get-buffer-create "*claude-code[other]*"))
@@ -113,36 +113,36 @@
         (puthash other-dir mock-process claude-code-ide--processes)
         (cl-letf (((symbol-function 'claude-code-ide--get-working-directory)
                    (lambda () "/test/new-project/"))
-                  ((symbol-function 'claude-code-ide-extras--close-visible-sessions)
+                  ((symbol-function 'claude-code-ide-companion--close-visible-sessions)
                    (lambda () (setq close-visible-called t)))
                   ((symbol-function 'claude-code-ide--display-buffer-in-side-window)
                    (lambda (buf) (setq displayed-buffer buf))))
-          (claude-code-ide-extras--on-context-switch)
+          (claude-code-ide-companion--on-context-switch)
           (should close-visible-called)
           (should (null displayed-buffer)))
         (delete-process mock-process)
         (kill-buffer other-buf))
-    (claude-code-ide-extras-tests--clear-processes)))
+    (claude-code-ide-companion-tests--clear-processes)))
 
-(ert-deftest claude-code-ide-extras-test-mode-installs-advice ()
+(ert-deftest claude-code-ide-companion-test-mode-installs-advice ()
   "Test that enabling the mode installs advice."
   (unwind-protect
       (progn
-        (claude-code-ide-extras-project-switch-mode 1)
-        (should (advice-member-p #'claude-code-ide-extras--on-context-switch 'project-switch-project)))
-    (claude-code-ide-extras-project-switch-mode -1)))
+        (claude-code-ide-companion-project-switch-mode 1)
+        (should (advice-member-p #'claude-code-ide-companion--on-context-switch 'project-switch-project)))
+    (claude-code-ide-companion-project-switch-mode -1)))
 
-(ert-deftest claude-code-ide-extras-test-mode-removes-advice ()
+(ert-deftest claude-code-ide-companion-test-mode-removes-advice ()
   "Test that disabling the mode removes advice."
-  (claude-code-ide-extras-project-switch-mode 1)
-  (claude-code-ide-extras-project-switch-mode -1)
-  (should-not (advice-member-p #'claude-code-ide-extras--on-context-switch 'project-switch-project)))
+  (claude-code-ide-companion-project-switch-mode 1)
+  (claude-code-ide-companion-project-switch-mode -1)
+  (should-not (advice-member-p #'claude-code-ide-companion--on-context-switch 'project-switch-project)))
 
-(defun claude-code-ide-extras-run-tests ()
-  "Run all claude-code-ide-extras tests."
+(defun claude-code-ide-companion-run-tests ()
+  "Run all claude-code-ide-companion tests."
   (interactive)
-  (ert-run-tests-interactively "^claude-code-ide-extras-test-"))
+  (ert-run-tests-interactively "^claude-code-ide-companion-test-"))
 
-(provide 'claude-code-ide-extras-tests)
+(provide 'claude-code-ide-companion-tests)
 
-;;; claude-code-ide-extras-tests.el ends here
+;;; claude-code-ide-companion-tests.el ends here
